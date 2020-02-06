@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<title>Flask image2text</title>
+<body>
+<style>
+  @import url('https://fonts.googleapis.com/css?family=Assistant&display=swap');
+  html, body {
+  width:  100%;
+  height: 100%;
+  margin: 1%;
+  }
+  body {
+    background: rgb(37, 26, 48);
+    font-family:'Assistant', sans-serif;
+    color: white;
+    font-size: 16px;
+  }
+  input[type=submit] {
+    background-color: #755fd4;
+    border-radius: 16px;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    cursor: pointer;
+    height: 37px;
+  }
+  input[type=file] {
+    background-color: #755fd4;
+    border-radius: 14px;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .column {
+    float: left;
+  }
+  .left {
+    width: 60%;
+  }
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  #show_config {
+    background-color: #755fd4;
+    border-radius: 16px;
+    padding: 11px 16px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-top: 17px;
+  }
+  #canvas{
+    background-image: url("{{filename}}");
+    background-size:     cover;
+  }
+  a {
+    font-family:'Assistant';
+    color: white;
+    font-size: 16px;
+  }
+  .btn_custom {
+    background-color: #755fd4;
+    border-radius: 16px;
+    /* padding: 50px 50px; */
+    width: 120px;
+    height: 37px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    /* margin: 20px; */
+  }
+</style>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script>
+  var img_path = "{{filename}}"
+  var canvas = null;
+  var ctx = null;
+  var imageObj = null;
+  var rectangles = [];
+  var rectnames = []
+  
+  var isDrawing = false;
+  var mouseStartX = 0.0;
+  var mouseStartY = 0.0;
+  var mouseEndX = 0.0;
+  var mouseEndY = 0.0;
+  var scale_img = 1.0
+  var len_rectangles = 0
+
+  {% if config_filename != '' %}
+    rectnames = {{ rectnames | tojson | safe }}
+    rectangles = {{ rectangles | tojson | safe }}
+    scale_img = {{ scale_img | tojson | safe}}
+  {% endif %}
+
+  var cur_rectangle = rectangles[rectangles.length - 1]
+
+  function Rectangle(x,y,width,height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
+  function initCanvas(){
+    canvas = document.getElementById("canvas");
+    ctx = canvas.getContext("2d");
+    imageObj = new Image();
+    imageObj.onload = function () { 
+        canvas.width = window.innerWidth*0.6;
+        scale_img = window.innerWidth/this.width
+        canvas.height = this.height*scale_img*0.6;
+        console.log(canvas.width, canvas.height)
+        console.log(this.width, this.height)   
+    };
+     imageObj.src = img_path;
+  }
+
+  function showConfig(){
+    addManyRectname()
+    draw()
+  }
+
+  function addRectname(index){
+    var num_cur_rect = index
+
+    var rect_a = document.createElement("a")
+    rect_a.setAttribute("id","rect_a"+num_cur_rect)
+    rect_a.innerHTML = '#'+ num_cur_rect + ' ['
+
+    var rectname = document.createElement("a")
+    rectname.setAttribute("id","rectname_input"+num_cur_rect)
+    // rectname.setAttribute("style","width: 70px; border: none; height: 19px; text-align: center;")
+    // console.log("rectnames[index-1]:",rectnames[index-1])
+    // if(rectnames[index-1] == null){
+    //   rectname.value = "rectname" + num_cur_rect
+    // }
+    // else{
+    rectname.innerHTML = rectnames[index-1] + "]:"
+    // }
+    // var rect_delete = document.createElement("button")
+    // rect_delete.setAttribute("type","button")
+    // rect_delete.setAttribute("id","rect_delete"+num_cur_rect)
+    // rect_delete.innerHTML = "X"
+
+    // style = "width: 40px; border: none; height: 19px; text-align: center; margin: 6px;"
+    // var rect_x = document.createElement("input")
+    // rect_x.setAttribute("type","number")
+    // rect_x.setAttribute("style",style)
+    // rect_x.setAttribute("id","rect_x" + num_cur_rect)
+    // rect_x.value = parseInt(rectangles[index-1].x)
+    
+    // var rect_y = document.createElement("input")
+    // rect_y.setAttribute("type","number")
+    // rect_y.setAttribute("style",style)
+    // rect_y.setAttribute("id","rect_y"+num_cur_rect)
+    // rect_y.value = parseInt(rectangles[index-1].y)
+    // var rect_w = document.createElement("input")
+    // rect_w.setAttribute("type","number")
+    // rect_w.setAttribute("style",style)
+    // rect_w.setAttribute("id","rect_w"+num_cur_rect)
+    // rect_w.value = rectangles[index-1].width
+    // var rect_h = document.createElement("input")
+    // rect_h.setAttribute("type","number")
+    // rect_h.setAttribute("style",style)
+    // rect_h.setAttribute("id","rect_h"+num_cur_rect)
+    // rect_h.value = rectangles[index-1].height
+    
+    var rect_text = document.createElement("a")
+    rect_text.setAttribute("id","rect_text"+num_cur_rect)
+    
+    var p = document.createElement("p")
+    p.setAttribute("id","rect_p"+num_cur_rect)
+    
+    document.getElementById("list_rect").appendChild(rect_a)
+    document.getElementById("list_rect").appendChild(rectname)
+    // document.getElementById("list_rect").appendChild(rect_delete)
+    // document.getElementById("list_rect").appendChild(rect_x)
+    // document.getElementById("list_rect").appendChild(rect_y)
+    // document.getElementById("list_rect").appendChild(rect_w)
+    // document.getElementById("list_rect").appendChild(rect_h)
+    document.getElementById("list_rect").appendChild(rect_text)
+    document.getElementById("list_rect").appendChild(p)
+    // $("#rectname_input" + num_cur_rect).on('keyup', function(){
+    //   //console.log(this.value)
+    //   rectnames[index-1] = this.value
+    // });
+    // $("#rect_delete" + num_cur_rect).on('click', function () {
+    //   console.log(rectnames)
+    //   rectangles.splice(num_cur_rect-1,1)
+    //   rectnames.splice(num_cur_rect-1,1)
+    //   clearAndShowListRect(true)
+    //   draw()
+    //   console.log(rectnames)
+    //   });
+    // $('#rect_x' + num_cur_rect).on('keyup', function () {
+    //   console.log(this.value)
+    //   console.log('#rect_x' +num_cur_rect)
+    //   rectangles[num_cur_rect-1].x = parseInt(this.value)
+    //   draw()
+    //   });
+    // $('#rect_y' + num_cur_rect).on('keyup', function () {
+    //   console.log(this.value)
+    //   rectangles[num_cur_rect-1].y = parseInt(this.value)
+    //   draw()
+    //   });
+    // $('#rect_w' + num_cur_rect).on('keyup', function () {
+    //   console.log(this.value)
+    //   rectangles[num_cur_rect-1].width = parseInt(this.value)
+    //   draw()
+    //   });
+    // $('#rect_h' + num_cur_rect).on('keyup', function () {
+    //   console.log(this.value)
+    //   rectangles[num_cur_rect-1].height = parseInt(this.value)
+    //   draw()
+    //   });
+  }
+  function addManyRectname(){
+    for (var i = 0; i < rectangles.length; ++i){
+      addRectname(i+1)
+    }
+  }
+
+  function clearAllRectname(flag = false){
+      var len_tmp = rectangles.length
+      if (flag==true){
+        len_tmp = len_tmp + 1;
+      }
+      for (var n=0; n < len_tmp; ++n){
+      var rect = document.getElementById("rect_a"+parseInt(n+1))
+      var rectname = document.getElementById("rectname_input"+parseInt(n+1))
+      // var rect_delete = document.getElementById("rect_delete"+parseInt(n+1))
+      // var rect_x = document.getElementById("rect_x"+parseInt(n+1))
+      // var rect_y = document.getElementById("rect_y"+parseInt(n+1))
+      // var rect_w = document.getElementById("rect_w"+parseInt(n+1))
+      // var rect_h = document.getElementById("rect_h"+parseInt(n+1))
+      var rect_text = document.getElementById("rect_text"+parseInt(n+1))
+      var p = document.getElementById("rect_p"+parseInt(n+1))
+
+      document.getElementById("list_rect").removeChild(rect)
+      document.getElementById("list_rect").removeChild(rectname)
+      // document.getElementById("list_rect").removeChild(rect_delete)
+      // document.getElementById("list_rect").removeChild(rect_x)
+      // document.getElementById("list_rect").removeChild(rect_y)
+      // document.getElementById("list_rect").removeChild(rect_w)
+      // document.getElementById("list_rect").removeChild(rect_h)
+      document.getElementById("list_rect").removeChild(rect_text)
+      document.getElementById("list_rect").removeChild(p)
+      }
+    }
+  
+  function clearAll(){
+    clearAllRectname();
+    rectangles = []
+    rectnames = []
+    cur_rectangle = null
+    draw()
+  }
+  function draw() {
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.strokeStyle = "green";
+    ctx.fillStyle = "red";
+    ctx.lineWidth = 2;
+    ctx.font = "bold 14pt Courier";
+    ctx.beginPath();
+    for (var i = 0; i < rectangles.length; ++i) {
+      var rectangle = rectangles[i];
+      ctx.rect( rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+      ctx.fillText("#" + (i+1) + "[" + rectnames[i] + "]", rectangle.x , rectangle.y - 3);
+    }
+    ctx.closePath()
+    ctx.stroke();
+  }
+
+  // function getMousePosition(e) {
+  //   if (canvas && e) {
+  //     var bounds = canvas.getBoundingClientRect();
+  //     return [
+  //       parseInt(e.clientX - bounds.left),
+  //       parseInt(e.clientY - bounds.top)
+  //     ];
+  //   } else {
+  //     return [
+  //       0.0,
+  //       0.0
+  //     ];
+  //   }
+  // }
+
+  // window.onmousedown = function(e) {
+  //   if (!isDrawing) {
+  //     isDrawing = true;
+  //     [mouseStartX,mouseStartY] = getMousePosition(e);
+  //     canvas.style.cursor = "crosshair";
+  //   }
+  // }
+
+  // window.onmouseup = function(e) {
+  //   if (isDrawing) {
+  //     isDrawing = false;
+  //   [mouseEndX,mouseEndY] = getMousePosition(e);
+  //   if (mouseStartX > mouseEndX){
+  //     var tmp = mouseStartX
+  //     mouseStartX = mouseEndX
+  //     mouseEndX = tmp
+  //   }
+  //   if (mouseStartY > mouseEndY){
+  //     var tmp = mouseStartY
+  //     mouseStartY = mouseEndY
+  //     mouseEndy = tmp
+  //   }
+  //   width_tmp = mouseEndX - mouseStartX
+  //   height_tmp = mouseEndY - mouseStartY
+  //   if ((mouseStartX >= 0) && (mouseEndX <= ctx.canvas.width) && (mouseStartY >= 0) && (mouseEndY <= ctx.canvas.height) && height_tmp != 0 && width_tmp != 0){
+  //     tmp_rect = new Rectangle(mouseStartX,mouseStartY,width_tmp,height_tmp)
+  //     rectangles.push(tmp_rect)
+  //     cur_rectangle = tmp_rect
+  //     rectnames.push("rectname"+rectangles.length)
+  //     document.getElementById("num_box").innerHTML = 'Num rects: '+ rectangles.length
+  //     addRectname(rectangles.length);
+  //     canvas.style.cursor = "default";
+  //     draw();
+  //   }
+  //   }
+  // }
+
+  // window.onmousemove = function(e) {
+  //   if (isDrawing) {
+  //     [mouseEndX,mouseEndY] = getMousePosition(e);
+  //     draw();
+  //     ctx.strokeRect(
+  //       mouseStartX,
+  //       mouseStartY,
+  //       mouseEndX - mouseStartX,
+  //       mouseEndY - mouseStartY);
+  //   }
+  // }
+
+  window.onload = function() {
+    initCanvas()
+  }
+
+function combineRectName(){
+  rectangles_with_name = []
+  for (var j=0; j<rectangles.length; ++j){
+    rectname_tmp = document.getElementById('rectname_input'+(j+1)).value
+    rectangle_tmp = rectangles[j]
+    rectangles_with_name.push({rectname:rectname_tmp, rectangle:rectangle_tmp})
+  }
+  return rectangles_with_name
+}
+
+function showRectnamed(){
+  for (var l=0; l<rectangles.length; ++l){
+    document.getElementById('rectname'+(l+1)).placeholder = rectnames[l]
+  }
+}
+
+function postRecognizeAllRectangles(){
+  if (rectangles.length == 0){
+      alert('Select config file!')
+  }
+  else{
+      document.getElementById("btn_recognition_all_rect").value = "Đang xử lý"
+      $.ajax({
+      type: "POST",
+      url: '/recognize_all_rectangles2',
+      data: JSON.stringify({rectangles:rectangles, scale_img:scale_img}),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success:function (response) {
+          console.log('postOneRectangles() successed!:',response)
+          if (response.success == true){
+            console.log("server ocr successed!")
+            console.log(response.data)
+            document.getElementById("btn_recognition_all_rect").value = "Nhận dạng tất cả trường"
+            for (var n=0; n< rectangles.length; ++n){
+              document.getElementById("rect_text"+parseInt(n+1)).innerHTML = "<span style='color:gold;'> "+response.data[n] + " </span>"
+              }
+            }
+          else {console.log("server ocr error!")}
+          }});
+  }
+}
+function checkConfigFile(){
+  config_file_name = document.getElementById("select_config_file")
+  var file = document.forms['form_upload2']['file2'].files[0];
+  if (typeof(file) == 'undefinedd'){
+    alert('Chọn mẫu trước!')
+  }
+  else{
+    window.location.href = '/preprocess_image';
+  }
+}
+</script>
+
+<div class="row">
+  <div class="column">
+    {% if filename == '' %}
+      <h5></h5>
+    {% else %}
+      <canvas id="canvas" style="text-align:left;"></canvas>
+    {% endif %}
+  </div>
+  <div class="column" style="text-align: right;">
+    <div class="xuli" style="text-align: center; padding-left: 50px; padding-top: 10px;">
+      <button class="btn_custom" onclick="window.location.href = '/';">Trang chủ</button>
+      <!--form upload image-->
+      {% if filename == '' %}
+      <h5 id='filename'>Chọn ảnh</h5>
+      {% else %}
+      <h5 id='filename'>Ảnh đã chọn: <span style="color: gold;">{{filename}}</span></h5>
+      {% endif %}
+      <form name ='form_upload' method="post" action="/uploadImage2" enctype="multipart/form-data">
+        <input name="file" type="file" id="file"/>
+        <input type="submit" value="Tải ảnh lên">
+      </form>
+      <button class="btn_custom" onclick="checkConfigFile()" style="margin-top: 17px;">Tiền xử lý ảnh</button>
+      <!-- <input id="btn_autodetect" type="submit" value="Auto Detect" onclick="javascript:postAutoDetect()" style="margin-top: 17px;"></input> -->
+      <!--form upload config-->
+      {% if config_filename == '' %}
+      <h5 id='config_filename'>Chọn mẫu</h5>
+      {% else %}
+      <h5 id='config_filename'>Mẫu đã chọn: <span style="color:gold;">{{config_filename}}</span></h5>
+      {% endif %} 
+      <form name ='form_upload2' method="post" action="/uploadConfig2" enctype="multipart/form-data">
+        <input name="file2" type="file" id="select_config_file"/>
+        <input id="btn_upload_config" type="submit" value="Tải mẫu lên">
+      </form>
+      <button id="show_config" onclick="javascript:showConfig()">Hiện mẫu đã chọn</button>
+      <!-- <h5 id="num_box">Num rects</h5> -->
+      <p>
+        <!-- <input id="btn_recognition_cur_rect" type="submit" value="Recognize current rect" onclick="javascript:postRecognizeOneRectangle()"></input> -->
+        
+        <!-- <button class="btn_custom" onclick="window.location.reload(true);">OK</button> -->
+
+        <input id="btn_recognition_all_rect" type="submit" value="Nhận dạng tất cả trường" onclick="javascript:postRecognizeAllRectangles()"></input>
+      </p>
+      <!-- <input id="btn_clear_all" type="submit" value="Clear" onclick="javascript:clearAll()"></input> -->
+      <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>
+      <!-- <h5>Save filename</h5>
+      <p><input id ="config_filename_pl" placeholder=""></input></p>
+      <p><input type="submit" value="Save rects" onclick="javascript:postRectangles()"></input></p> -->
+      <div id="preview">
+        <img src="static/upload/align-tranf2.png">
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

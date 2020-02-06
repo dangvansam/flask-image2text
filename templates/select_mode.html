@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<title>Flask image2text</title>
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Assistant&display=swap');
+    html, body {
+    width:  100%;
+    height: 100%;
+    margin: 1%;
+    }
+    body {
+      background: rgb(37, 26, 48);
+      font-family:'Assistant', sans-serif;
+      color: white;
+      font-size: 30px;
+      text-align: center;
+    }
+    input[type=submit] {
+      background-color: #755fd4;
+      border-radius: 16px;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      cursor: pointer;
+      height: 37px;
+    }
+    .btn_custom {
+    background-color: #755fd4;
+    border-radius: 16px;
+    /* padding: 50px 50px; */
+    width: 150px;
+    height: 40px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin: 20px;
+  }
+    .dev {
+        margin-top: 100px;
+    }
+  </style>
+<body>
+    <div class="dev">
+        <h3>Chọn chức năng</h3>
+        <button class="btn_custom" id="1" onclick="window.location.href = '/index';">Tạo mẫu</button>
+        <button class="btn_custom" id="2"onclick="window.location.href = '/index2';">Sử dụng mẫu</button>
+    </div>
+</body>
+</html>

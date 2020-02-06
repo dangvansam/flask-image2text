@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>File</h2>
+<canvas id="canvas"></canvas>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+var rect = {};
+var list_rect = [];
+var drag = false;
+var imageObj = null;
+var width = 0
+var height = 0
+
+function init() {
+    imageObj = new Image();
+    imageObj.onload = function () { 
+        width = this.width;
+        height = this.height;
+        console.log(height,width)
+        canvas.height = height;
+        canvas.width = width;
+        ctx.drawImage(imageObj, 0, 0); };
+    imageObj.src = '01GTKT0_059.jpg';
+    canvas.addEventListener('mousedown', mouseDown, false);
+    canvas.addEventListener('mouseup', mouseUp, false);
+    canvas.addEventListener('mousemove', mouseMove, false);
+}
+
+function mouseDown(e) {
+    rect.startX = e.pageX - this.offsetLeft;
+    rect.startY = e.pageY - this.offsetTop;
+    drag = true;
+}
+
+function mouseUp() { 
+    drag = false;
+    //console.log(rect)
+    list_rect.push(rect)
+    //console.log(list_rect)
+}
+
+function mouseMove(e) {
+    if (drag) {
+        //ctx.clearRect(0, 0, imageObj.width, imageObj.height);
+        ctx.drawImage(imageObj, 0, 0);
+        for (i=0;i<list_rect.length;i++){
+            //console.log('draw',i);
+            var startX_tmp = list_rect[i].startX;
+            var startY_tmp = list_rect[i].startY;
+            var w_tmp = list_rect[i].w;
+            var h_tmp = list_rect[i].h;
+            ctx.strokeStyle = 'green';
+            ctx.strokeRect(startX_tmp,startY_tmp,w_tmp,h_tmp);
+        }
+        rect.w = (e.pageX - this.offsetLeft) - rect.startX;
+        rect.h = (e.pageY - this.offsetTop) - rect.startY;
+        ctx.strokeStyle = 'red';
+        ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+        //console.log(imageObj.width);
+    }
+}
+//
+init();
+</script>
+
+</body>
+</html>
