@@ -191,27 +191,27 @@ def index2():
     scale_img= ''
     if 'filename2' in session:
         filename = session['filename2']
-    if 'config_filename2' in session:
-        config_filename = session['config_filename2']
-    if 'rectnames2' in session:
-        rectnames = session['rectnames2']
-    if 'rectangles2' in session:
-        rectangles = session['rectangles2']
-    if 'scale_img2' in session:
-        scale_img = session['scale_img2']
+    # if 'config_filename2' in session:
+    #     config_filename = session['config_filename2']
+    # if 'rectnames2' in session:
+    #     rectnames = session['rectnames2']
+    # if 'rectangles2' in session:
+    #     rectangles = session['rectangles2']
+    # if 'scale_img2' in session:
+    #     scale_img = session['scale_img2']
     return render_template('view2.html', filename = filename, config_filename = config_filename, rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 
 @app.route('/uploadImage2', methods=['POST'])
 def uploadImage2():
     #session['config_filename2'] = ''
-    if 'config_filename2' in session:
-        session.pop('config_filename2',None)
-    if 'rectnames2' in session:
-        session.pop('rectnames2',None)
-    if 'rectangles2' in session:
-        session.pop('rectangles2',None)
-    if 'scale_img2' in session:
-        session.pop('scale_img2',None)
+    # if 'config_filename2' in session:
+    #     session.pop('config_filename2',None)
+    # if 'rectnames2' in session:
+    #     session.pop('rectnames2',None)
+    # if 'rectangles2' in session:
+    #     session.pop('rectangles2',None)
+    # if 'scale_img2' in session:
+    #     session.pop('scale_img2',None)
 
     image = request.files['file']
     if image.filename == '':
@@ -222,8 +222,8 @@ def uploadImage2():
     #print('Write file success! '+filename)
     session['filename2'] = filename
     #print(session['config_filename2'])
-    return redirect('/index2')
-    #return render_template('view2.html', filename = filename, config_filename = '', rectnames = '', rectangles = '', scale_img= '')
+    #return redirect('/index2')
+    return render_template('view2.html', filename = filename, config_filename = '', rectnames = '', rectangles = '', scale_img= '')
 
 @app.route('/uploadConfig2', methods=['POST'])
 def viewConfig2():
@@ -231,14 +231,14 @@ def viewConfig2():
         print("filename not in session")
         return index2()
     a = {}
-    #try:
-    config = request.files['file2'].read()
-    print(config)
-    config = json.loads(config)
-    a = json.dumps(config)
-    # except:
-    #     print('read config request error')
-    #     return index2()
+    try:
+        config = request.files['file2'].read()
+        print(config)
+        config = json.loads(config)
+        a = json.dumps(config)
+     except:
+         print('read config request error')
+         return index2()
     print(config)
     if 'config_filename' not in config:
         print('config_filename not in config')
@@ -255,12 +255,12 @@ def viewConfig2():
     print(rectangles)
     print(scale_img)
     session['config_filename2'] = config_filename
-    session['rectnames'] = rectnames
-    session['rectangles'] = rectangles
-    session['scale_img'] = scale_img
+    # session['rectnames'] = rectnames
+    # session['rectangles'] = rectangles
+    # session['scale_img'] = scale_img
     print(rectnames)
-    return redirect('/index2')
-    #return render_template('view2.html', filename = session['filename2'], config_filename = config_filename, rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
+    #return redirect('/index2')
+    return render_template('view2.html', filename = session['filename2'], config_filename = config_filename, rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 
 @app.route('/recognize_all_rectangles2',methods=['POST'])
 def recognizeAllrectangle2():
@@ -300,11 +300,11 @@ def preprocessImage():
     json_config_name = session['config_filename2']
     image_confile_filename = 'static/mau/' + json_config_name.replace('.json','') + '.png'
     print(image_confile_filename, image_process_filename, json_config_name)
-    align_filename = alignFile(image_confile_filename, image_process_filename)
-    print(session['filename2'])
-    session.pop('filename2',None)
-    session['filename2'] = align_filename
-    print(session['filename2'])
+    _ = alignFile(image_confile_filename, image_process_filename)
+    #print(session['filename2'])
+    #session.pop('filename2',None)
+    #session['filename2'] = align_filename
+    #print(session['filename2'])
     #session['filename2'] = align_filename
     rectnames = []
     rectangles = []
@@ -315,8 +315,8 @@ def preprocessImage():
         for rect in config['rectangles']:
             rectnames.append(rect['rectname'])
             rectangles.append(rect['rectangle'])
-    return redirect('/index2')
-    #return render_template('view2.html', filename = session['filename2'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
+    #return redirect('/index2')
+    return render_template('view2.html', filename = session['filename2'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 if __name__ == '__main__':
     app.secret_key = 'dangvansam'
     app.run(debug=True)

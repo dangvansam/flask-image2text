@@ -56,7 +56,7 @@ def alignFile(filename1, filename2):
   imReference = cv2.imread(filename1, cv2.IMREAD_COLOR)
   im = cv2.imread(filename2, cv2.IMREAD_COLOR)
   imReg, h = alignImages(im, imReference)
-  outFilename = filename2.replace('.png','_align.png')
+  outFilename = filename2#.replace('.png','_align.png')
   cv2.imwrite(outFilename, imReg)
   return outFilename
 
