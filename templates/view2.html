@@ -72,6 +72,19 @@
     cursor: pointer;
     /* margin: 20px; */
   }
+  img {
+  border: 0px solid #ddd;
+  border-radius: 10px;
+  padding: 2px;
+  /* width: 150px; */
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+  }
+
+  img:hover {
+    border: 1px solid #ddd;
+    /* border: 0 0 2px 1px #e4bd3e; */
+    /* padding: 5px; */
+  }
 </style>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
@@ -89,12 +102,17 @@
   var mouseEndX = 0.0;
   var mouseEndY = 0.0;
   var scale_img = 1.0
-  var len_rectangles = 0
+  //var len_rectangles = 0
+  var list_config_files = []
 
   {% if config_filename != '' %}
     rectnames = {{ rectnames | tojson | safe }}
     rectangles = {{ rectangles | tojson | safe }}
     scale_img = {{ scale_img | tojson | safe}}
+  {% endif %}
+
+  {% if list_config_files != '' %}
+    list_config_files = {{ list_config_files | tojson | safe }}
   {% endif %}
 
   var cur_rectangle = rectangles[rectangles.length - 1]
@@ -122,6 +140,7 @@
   function showConfig(){
     addManyRectname()
     draw()
+    //console.log('sau draw')
   }
 
   function addRectname(index){
@@ -133,41 +152,7 @@
 
     var rectname = document.createElement("a")
     rectname.setAttribute("id","rectname_input"+num_cur_rect)
-    // rectname.setAttribute("style","width: 70px; border: none; height: 19px; text-align: center;")
-    // console.log("rectnames[index-1]:",rectnames[index-1])
-    // if(rectnames[index-1] == null){
-    //   rectname.value = "rectname" + num_cur_rect
-    // }
-    // else{
     rectname.innerHTML = rectnames[index-1] + "]:"
-    // }
-    // var rect_delete = document.createElement("button")
-    // rect_delete.setAttribute("type","button")
-    // rect_delete.setAttribute("id","rect_delete"+num_cur_rect)
-    // rect_delete.innerHTML = "X"
-
-    // style = "width: 40px; border: none; height: 19px; text-align: center; margin: 6px;"
-    // var rect_x = document.createElement("input")
-    // rect_x.setAttribute("type","number")
-    // rect_x.setAttribute("style",style)
-    // rect_x.setAttribute("id","rect_x" + num_cur_rect)
-    // rect_x.value = parseInt(rectangles[index-1].x)
-    
-    // var rect_y = document.createElement("input")
-    // rect_y.setAttribute("type","number")
-    // rect_y.setAttribute("style",style)
-    // rect_y.setAttribute("id","rect_y"+num_cur_rect)
-    // rect_y.value = parseInt(rectangles[index-1].y)
-    // var rect_w = document.createElement("input")
-    // rect_w.setAttribute("type","number")
-    // rect_w.setAttribute("style",style)
-    // rect_w.setAttribute("id","rect_w"+num_cur_rect)
-    // rect_w.value = rectangles[index-1].width
-    // var rect_h = document.createElement("input")
-    // rect_h.setAttribute("type","number")
-    // rect_h.setAttribute("style",style)
-    // rect_h.setAttribute("id","rect_h"+num_cur_rect)
-    // rect_h.value = rectangles[index-1].height
     
     var rect_text = document.createElement("a")
     rect_text.setAttribute("id","rect_text"+num_cur_rect)
@@ -177,46 +162,8 @@
     
     document.getElementById("list_rect").appendChild(rect_a)
     document.getElementById("list_rect").appendChild(rectname)
-    // document.getElementById("list_rect").appendChild(rect_delete)
-    // document.getElementById("list_rect").appendChild(rect_x)
-    // document.getElementById("list_rect").appendChild(rect_y)
-    // document.getElementById("list_rect").appendChild(rect_w)
-    // document.getElementById("list_rect").appendChild(rect_h)
     document.getElementById("list_rect").appendChild(rect_text)
     document.getElementById("list_rect").appendChild(p)
-    // $("#rectname_input" + num_cur_rect).on('keyup', function(){
-    //   //console.log(this.value)
-    //   rectnames[index-1] = this.value
-    // });
-    // $("#rect_delete" + num_cur_rect).on('click', function () {
-    //   console.log(rectnames)
-    //   rectangles.splice(num_cur_rect-1,1)
-    //   rectnames.splice(num_cur_rect-1,1)
-    //   clearAndShowListRect(true)
-    //   draw()
-    //   console.log(rectnames)
-    //   });
-    // $('#rect_x' + num_cur_rect).on('keyup', function () {
-    //   console.log(this.value)
-    //   console.log('#rect_x' +num_cur_rect)
-    //   rectangles[num_cur_rect-1].x = parseInt(this.value)
-    //   draw()
-    //   });
-    // $('#rect_y' + num_cur_rect).on('keyup', function () {
-    //   console.log(this.value)
-    //   rectangles[num_cur_rect-1].y = parseInt(this.value)
-    //   draw()
-    //   });
-    // $('#rect_w' + num_cur_rect).on('keyup', function () {
-    //   console.log(this.value)
-    //   rectangles[num_cur_rect-1].width = parseInt(this.value)
-    //   draw()
-    //   });
-    // $('#rect_h' + num_cur_rect).on('keyup', function () {
-    //   console.log(this.value)
-    //   rectangles[num_cur_rect-1].height = parseInt(this.value)
-    //   draw()
-    //   });
   }
   function addManyRectname(){
     for (var i = 0; i < rectangles.length; ++i){
@@ -232,21 +179,11 @@
       for (var n=0; n < len_tmp; ++n){
       var rect = document.getElementById("rect_a"+parseInt(n+1))
       var rectname = document.getElementById("rectname_input"+parseInt(n+1))
-      // var rect_delete = document.getElementById("rect_delete"+parseInt(n+1))
-      // var rect_x = document.getElementById("rect_x"+parseInt(n+1))
-      // var rect_y = document.getElementById("rect_y"+parseInt(n+1))
-      // var rect_w = document.getElementById("rect_w"+parseInt(n+1))
-      // var rect_h = document.getElementById("rect_h"+parseInt(n+1))
       var rect_text = document.getElementById("rect_text"+parseInt(n+1))
       var p = document.getElementById("rect_p"+parseInt(n+1))
 
       document.getElementById("list_rect").removeChild(rect)
       document.getElementById("list_rect").removeChild(rectname)
-      // document.getElementById("list_rect").removeChild(rect_delete)
-      // document.getElementById("list_rect").removeChild(rect_x)
-      // document.getElementById("list_rect").removeChild(rect_y)
-      // document.getElementById("list_rect").removeChild(rect_w)
-      // document.getElementById("list_rect").removeChild(rect_h)
       document.getElementById("list_rect").removeChild(rect_text)
       document.getElementById("list_rect").removeChild(p)
       }
@@ -275,72 +212,14 @@
     ctx.stroke();
   }
 
-  // function getMousePosition(e) {
-  //   if (canvas && e) {
-  //     var bounds = canvas.getBoundingClientRect();
-  //     return [
-  //       parseInt(e.clientX - bounds.left),
-  //       parseInt(e.clientY - bounds.top)
-  //     ];
-  //   } else {
-  //     return [
-  //       0.0,
-  //       0.0
-  //     ];
-  //   }
-  // }
-
-  // window.onmousedown = function(e) {
-  //   if (!isDrawing) {
-  //     isDrawing = true;
-  //     [mouseStartX,mouseStartY] = getMousePosition(e);
-  //     canvas.style.cursor = "crosshair";
-  //   }
-  // }
-
-  // window.onmouseup = function(e) {
-  //   if (isDrawing) {
-  //     isDrawing = false;
-  //   [mouseEndX,mouseEndY] = getMousePosition(e);
-  //   if (mouseStartX > mouseEndX){
-  //     var tmp = mouseStartX
-  //     mouseStartX = mouseEndX
-  //     mouseEndX = tmp
-  //   }
-  //   if (mouseStartY > mouseEndY){
-  //     var tmp = mouseStartY
-  //     mouseStartY = mouseEndY
-  //     mouseEndy = tmp
-  //   }
-  //   width_tmp = mouseEndX - mouseStartX
-  //   height_tmp = mouseEndY - mouseStartY
-  //   if ((mouseStartX >= 0) && (mouseEndX <= ctx.canvas.width) && (mouseStartY >= 0) && (mouseEndY <= ctx.canvas.height) && height_tmp != 0 && width_tmp != 0){
-  //     tmp_rect = new Rectangle(mouseStartX,mouseStartY,width_tmp,height_tmp)
-  //     rectangles.push(tmp_rect)
-  //     cur_rectangle = tmp_rect
-  //     rectnames.push("rectname"+rectangles.length)
-  //     document.getElementById("num_box").innerHTML = 'Num rects: '+ rectangles.length
-  //     addRectname(rectangles.length);
-  //     canvas.style.cursor = "default";
-  //     draw();
-  //   }
-  //   }
-  // }
-
-  // window.onmousemove = function(e) {
-  //   if (isDrawing) {
-  //     [mouseEndX,mouseEndY] = getMousePosition(e);
-  //     draw();
-  //     ctx.strokeRect(
-  //       mouseStartX,
-  //       mouseStartY,
-  //       mouseEndX - mouseStartX,
-  //       mouseEndY - mouseStartY);
-  //   }
-  // }
-
   window.onload = function() {
     initCanvas()
+    showListConfigFiles()
+    if (rectangles.length > 0){
+      console.log(rectangles.length)
+      showConfig()
+      draw()
+    }
   }
 
 function combineRectName(){
@@ -385,8 +264,8 @@ function postRecognizeAllRectangles(){
           }});
   }
 }
-function checkConfigFile(){
-  config_file_name = document.getElementById("select_config_file")
+function checkSelectImageFile(){
+  img = document.getElementById("select_config_file")
   var file = document.forms['form_upload2']['file2'].files[0];
   if (typeof(file) == 'undefinedd'){
     alert('Chọn mẫu trước!')
@@ -395,6 +274,24 @@ function checkConfigFile(){
     window.location.href = '/preprocess_image';
   }
 }
+
+function showListConfigFiles(){
+  for (var i =0; i< list_config_files.length; ++i){
+    var cf_name = document.createElement('a')
+    cf_name.setAttribute('id','cf_name'+i)
+    cf_name.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' width='200'; title='Xem mẫu'> <p style='margin-top:0px; margin-bottom: 25px;'> Mẫu "+ parseInt(i+1) + ":" + "<span style='color:gold;'> " + list_config_files[i] + " </span></p>"
+    cf_name.setAttribute('href',list_config_files[i])
+    cf_name.setAttribute('style','margin-bottom:17px;')
+
+    var cf_p = document.createElement('p')
+
+    document.getElementById('list_config').appendChild(cf_name)
+    document.getElementById('list_config').appendChild(cf_p)
+  }
+}
+$("#btn_upload_img").on("click", function(){
+
+});
 </script>
 
 <div class="row">
@@ -414,14 +311,23 @@ function checkConfigFile(){
       {% else %}
       <h5 id='filename'>Ảnh đã chọn: <span style="color: gold;">{{filename}}</span></h5>
       {% endif %}
+
       <form name ='form_upload' method="post" action="/uploadImage2" enctype="multipart/form-data">
-        <input name="file" type="file" id="file"/>
-        <input type="submit" value="Tải ảnh lên">
+        <input name="file" type="file" id="select_file"/>
+        <input id="btn_upload_img" type="submit" value="Tải ảnh lên">
       </form>
-      <button class="btn_custom" onclick="checkConfigFile()" style="margin-top: 17px;">Tiền xử lý ảnh</button>
+      <div class="h5" style=" margin-top:10px">Chọn ảnh demo:</div>
+      <div id="demo_img" style="padding-top: 10px;">
+        <a href="/demo_static_demo_hoadontiendien-3.png"><img src="static/demo/hoadontiendien-3.png" alt="" width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_hoadontiendien-2.png"><img src="static/demo/hoadontiendien-2.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_cccd-1.png"><img src="static/demo/cccd-1.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_cccd-2.png"><img src="static/demo/cccd-2.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_cccd-3.png"><img src="static/demo/cccd-3.png" alt=""  width="50" style="border-radius: 5px;"></a>
+      </div>
       <!-- <input id="btn_autodetect" type="submit" value="Auto Detect" onclick="javascript:postAutoDetect()" style="margin-top: 17px;"></input> -->
       <!--form upload config-->
-      {% if config_filename == '' %}
+      <!-- <button class="btn_custom" onclick="showListConfigFiles()" style="margin-top: 17px;">Xem mẫu có sẵn</button> -->
+      <!-- {% if config_filename == '' %}
       <h5 id='config_filename'>Chọn mẫu</h5>
       {% else %}
       <h5 id='config_filename'>Mẫu đã chọn: <span style="color:gold;">{{config_filename}}</span></h5>
@@ -429,15 +335,18 @@ function checkConfigFile(){
       <form name ='form_upload2' method="post" action="/uploadConfig2" enctype="multipart/form-data">
         <input name="file2" type="file" id="select_config_file"/>
         <input id="btn_upload_config" type="submit" value="Tải mẫu lên">
-      </form>
-      <button id="show_config" onclick="javascript:showConfig()">Hiện mẫu đã chọn</button>
+      </form> -->
+      <!-- <button id="show_config" onclick="javascript:showConfig()">Hiện mẫu đã chọn</button> -->
       <!-- <h5 id="num_box">Num rects</h5> -->
       <p>
         <!-- <input id="btn_recognition_cur_rect" type="submit" value="Recognize current rect" onclick="javascript:postRecognizeOneRectangle()"></input> -->
         
         <!-- <button class="btn_custom" onclick="window.location.reload(true);">OK</button> -->
-
+        
+        <button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Tiền xử lý ảnh</button>
         <input id="btn_recognition_all_rect" type="submit" value="Nhận dạng tất cả trường" onclick="javascript:postRecognizeAllRectangles()"></input>
+        <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div>
+        <div id="list_config" ></div>
       </p>
       <!-- <input id="btn_clear_all" type="submit" value="Clear" onclick="javascript:clearAll()"></input> -->
       <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>
