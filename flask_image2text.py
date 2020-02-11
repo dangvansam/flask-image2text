@@ -6,6 +6,7 @@ from flask import Flask, request, render_template, url_for, session, jsonify, ma
 import pytesseract
 import matplotlib.pyplot as plt
 import shutil
+import numpy as np
 
 app = Flask(__name__)
 @app.route('/',methods=['GET'])
@@ -33,7 +34,7 @@ def index():
 @app.route('/uploadImage', methods=['POST'])
 def viewImage():
     #print(request)
-    session = None
+    #session = None
     image = request.files['file']
     if image.filename == '':
         return index()
@@ -170,6 +171,9 @@ def recognizeAllrectangle():
         #plt.show()
         print(crop_img.shape)
         crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
+        crop_img = unsharp_mask(crop_img)
+        plt.imshow(crop_img[:,:,0])
+        plt.show()
         #crop = cv2.cvtColor(crop_img, cv2.COLOR_RGB2GRAY)
         #crop = cv2.GaussianBlur(crop, (1, 1), 0)
         #_, crop = cv2.threshold(crop, 120 ,255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
@@ -279,6 +283,31 @@ def viewConfig_byselect(config_filename):
             rectangles.append(rect['rectangle'])
     return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 
+def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
+    """Return a sharpened version of the image, using an unsharp mask."""
+    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
+    sharpened = float(amount + 1) * image - float(amount) * blurred
+    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
+    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
+    sharpened = sharpened.round().astype(np.uint8)
+    if threshold > 0:
+        low_contrast_mask = np.absolute(image - blurred) < threshold
+        np.copyto(sharpened, image, where=low_contrast_mask)
+    return sharpened
+
+def kmeans(input_img, k, i_val):
+    hist = cv2.calcHist([input_img],[0],None,[256],[0,256])
+    img = input_img.ravel()
+    img = np.reshape(img, (-1, 1))
+    img = img.astype(np.float32)
+
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    flags = cv2.KMEANS_RANDOM_CENTERS
+    compactness,labels,centers = cv2.kmeans(img,k,None,criteria,10,flags)
+    centers = np.sort(centers, axis=0)
+
+    return centers[i_val].astype(int), centers, hist
+
 @app.route('/recognize_all_rectangles2',methods=['POST'])
 def recognizeAllrectangle2():
     rq = request.get_json()
@@ -294,16 +323,23 @@ def recognizeAllrectangle2():
         h = rectangle['height']/scale_img
         #print(rectangle['x'],rectangle['y'],rectangle['width'],rectangle['height'])
         crop_img = img[int(y):int(y+h), int(x):int(x+w)]
-        #plt.imshow(crop_img[:,:,0])
+        crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
+        #crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
+
+        #plt.imshow(crop_img)
+        #plt.show()
+
+        #_, crop_img = cv2.threshold(crop_img, kmeans(input_img=img, k=8, i_val=2)[0], 255, cv2.THRESH_BINARY)
+        
+        #plt.imshow(crop_img)
         #plt.show()
         #print(crop_img.shape)
-        crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
         #crop = cv2.cvtColor(crop_img, cv2.COLOR_RGB2GRAY)
         #crop = cv2.GaussianBlur(crop, (1, 1), 0)
-        #_, crop = cv2.threshold(crop, 120 ,255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
-        #plt.imshow(crop)
-        #plt.show()
-        text = pytesseract.image_to_string(crop_img, config='-l vie --oem 1')
+        #_, crop_img = cv2.threshold(crop_img, 120 ,255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+        # plt.imshow(crop)
+        # plt.show()
+        text = pytesseract.image_to_string(crop_img, config='-l vie --psm 13')
         texts.append(text)
     print(texts)
     resp = jsonify(success=True,data=texts)

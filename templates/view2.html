@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<head><link rel="shortcut icon" href=""></head>
 <title>Flask image2text</title>
 <body>
 <style>
@@ -215,11 +216,11 @@
   window.onload = function() {
     initCanvas()
     showListConfigFiles()
-    if (rectangles.length > 0){
-      console.log(rectangles.length)
-      showConfig()
-      draw()
-    }
+    // if (rectangles.length > 0){
+    //   console.log(rectangles.length)
+    //   //showConfig()
+    //   draw()
+    // }
   }
 
 function combineRectName(){
@@ -255,7 +256,7 @@ function postRecognizeAllRectangles(){
           if (response.success == true){
             console.log("server ocr successed!")
             console.log(response.data)
-            document.getElementById("btn_recognition_all_rect").value = "Nhận dạng tất cả trường"
+            document.getElementById("btn_recognition_all_rect").value = "Nhận dạng"
             for (var n=0; n< rectangles.length; ++n){
               document.getElementById("rect_text"+parseInt(n+1)).innerHTML = "<span style='color:gold;'> "+response.data[n] + " </span>"
               }
@@ -319,10 +320,11 @@ $("#btn_upload_img").on("click", function(){
       <div class="h5" style=" margin-top:10px">Chọn ảnh demo:</div>
       <div id="demo_img" style="padding-top: 10px;">
         <a href="/demo_static_demo_hoadontiendien-3.png"><img src="static/demo/hoadontiendien-3.png" alt="" width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_hoadontiendien-2.png"><img src="static/demo/hoadontiendien-2.png" alt=""  width="50" style="border-radius: 5px;"></a>
         <a href="/demo_static_demo_cccd-1.png"><img src="static/demo/cccd-1.png" alt=""  width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_cccd-2.png"><img src="static/demo/cccd-2.png" alt=""  width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_cccd-3.png"><img src="static/demo/cccd-3.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_CMND-29.png"><img src="static/demo/CMND-29.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_CMND-28.png"><img src="static/demo/CMND-28.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_IMG-0924.png"><img src="static/demo/IMG-0924.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <!-- <a href="/demo_static_demo_cccd-3.png"><img src="static/demo/cccd-3.png" alt=""  width="50" style="border-radius: 5px;"></a> -->
       </div>
       <!-- <input id="btn_autodetect" type="submit" value="Auto Detect" onclick="javascript:postAutoDetect()" style="margin-top: 17px;"></input> -->
       <!--form upload config-->
@@ -336,18 +338,11 @@ $("#btn_upload_img").on("click", function(){
         <input name="file2" type="file" id="select_config_file"/>
         <input id="btn_upload_config" type="submit" value="Tải mẫu lên">
       </form> -->
-      <!-- <button id="show_config" onclick="javascript:showConfig()">Hiện mẫu đã chọn</button> -->
-      <!-- <h5 id="num_box">Num rects</h5> -->
-      <p>
-        <!-- <input id="btn_recognition_cur_rect" type="submit" value="Recognize current rect" onclick="javascript:postRecognizeOneRectangle()"></input> -->
-        
-        <!-- <button class="btn_custom" onclick="window.location.reload(true);">OK</button> -->
-        
-        <button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Tiền xử lý ảnh</button>
-        <input id="btn_recognition_all_rect" type="submit" value="Nhận dạng tất cả trường" onclick="javascript:postRecognizeAllRectangles()"></input>
-        <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div>
-        <div id="list_config" ></div>
-      </p>
+      <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div>
+      <div id="list_config" ></div>
+      <p><button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Xử lý ảnh(Ctrl+F5)</button></p>
+      <p><button id="show_config" onclick="javascript:showConfig()">Hiện khung</button></p>
+      <p><input id="btn_recognition_all_rect" type="submit" value="Nhận dạng" onclick="javascript:postRecognizeAllRectangles()"></input></p>
       <!-- <input id="btn_clear_all" type="submit" value="Clear" onclick="javascript:clearAll()"></input> -->
       <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>
       <!-- <h5>Save filename</h5>
