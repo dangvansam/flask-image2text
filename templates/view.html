@@ -491,6 +491,7 @@ function showRectnamed(){
     document.getElementById('rectname'+(l+1)).placeholder = rectnames[l]
   }
 }
+
 function postSaveConfig(){
   var rectangles_with_name = combineRectName()
   //console.log('aaaa:',rectangles_with_name)
@@ -513,6 +514,10 @@ function postSaveConfig(){
       success: function(response){
         if (response.success == true){
           console.log('save json file success!')
+          setTimeout(function(){
+            document.getElementById("btn_saveconfig").value = "Đã lưu"
+          }, 1000);
+          document.getElementById("btn_saveconfig").value = "Lưu mẫu"
         }
         else{
           alert(response.error)
@@ -656,7 +661,7 @@ function postAutoDetect(){
       <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>
       <h5>Save filename</h5>
       <p><input id ="config_filename_pl" placeholder=""></input></p>
-      <p><input type="submit" value="Lưu mẫu" onclick="javascript:postSaveConfig()"></input></p>
+      <p><input id="btn_saveconfig" type="submit" value="Lưu mẫu" onclick="javascript:postSaveConfig()"></input></p>
     </div>
   </div>
 </div>

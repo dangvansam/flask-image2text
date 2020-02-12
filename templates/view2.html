@@ -139,6 +139,7 @@
   }
 
   function showConfig(){
+    //clearAllRectname(false)
     addManyRectname()
     draw()
     //console.log('sau draw')
@@ -199,21 +200,38 @@
   }
   function draw() {
     ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.strokeStyle = "green";
-    ctx.fillStyle = "red";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = "red";
+    ctx.fillStyle = "lime";
+    ctx.lineWidth = 1;
     ctx.font = "bold 14pt Courier";
     ctx.beginPath();
     for (var i = 0; i < rectangles.length; ++i) {
       var rectangle = rectangles[i];
       ctx.rect( rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-      ctx.fillText("#" + (i+1) + "[" + rectnames[i] + "]", rectangle.x , rectangle.y - 3);
+      ctx.fillText("#" + (i+1) + "[" + rectnames[i] + "]", rectangle.x, rectangle.y - 5);
+    }
+    ctx.closePath()
+    ctx.stroke();
+  }
+  function drawWithText(texts) {
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.strokeStyle = "red";
+    ctx.fillStyle = "lime";
+    ctx.lineWidth = 1;
+    ctx.font = "bold 14pt Courier";
+    ctx.beginPath();
+    for (var i = 0; i < rectangles.length; ++i) {
+      var rectangle = rectangles[i];
+      ctx.rect( rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+      ctx.fillText(texts[i], rectangle.x , rectangle.y - 5)
     }
     ctx.closePath()
     ctx.stroke();
   }
 
+
   window.onload = function() {
+    //window.href = location.href;
     initCanvas()
     showListConfigFiles()
     // if (rectangles.length > 0){
@@ -256,6 +274,10 @@ function postRecognizeAllRectangles(){
           if (response.success == true){
             console.log("server ocr successed!")
             console.log(response.data)
+            //clearAllRectname()
+            //showConfig()
+            addManyRectname()
+            drawWithText(response.data)
             document.getElementById("btn_recognition_all_rect").value = "Nhận dạng"
             for (var n=0; n< rectangles.length; ++n){
               document.getElementById("rect_text"+parseInt(n+1)).innerHTML = "<span style='color:gold;'> "+response.data[n] + " </span>"
@@ -265,6 +287,7 @@ function postRecognizeAllRectangles(){
           }});
   }
 }
+
 function checkSelectImageFile(){
   img = document.getElementById("select_config_file")
   var file = document.forms['form_upload2']['file2'].files[0];
@@ -279,20 +302,27 @@ function checkSelectImageFile(){
 function showListConfigFiles(){
   for (var i =0; i< list_config_files.length; ++i){
     var cf_name = document.createElement('a')
-    cf_name.setAttribute('id','cf_name'+i)
-    cf_name.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' width='200'; title='Xem mẫu'> <p style='margin-top:0px; margin-bottom: 25px;'> Mẫu "+ parseInt(i+1) + ":" + "<span style='color:gold;'> " + list_config_files[i] + " </span></p>"
-    cf_name.setAttribute('href',list_config_files[i])
+    cf_name.setAttribute('id','cf_name'+parseInt(i+1))
+    if (list_config_files[i] == '{{ config_filename }}'){
+      cf_name.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' width='150'; title='Chọn mẫu'> <p style='margin-top:0px; margin-bottom: 25px;'> Đã chọn: " + "<span style='color:lime;'> " + list_config_files[i] + " </span></p>"
+    }
+    else{
+      cf_name.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' width='150'; title='Chọn mẫu'> <p style='margin-top:0px; margin-bottom: 25px;'>" + "<span style='color:white;'> " + list_config_files[i] + " </span></p>"
+    }
+
+    cf_name.setAttribute('href', 'selectconfigandalign_'+ list_config_files[i])
     cf_name.setAttribute('style','margin-bottom:17px;')
 
     var cf_p = document.createElement('p')
 
     document.getElementById('list_config').appendChild(cf_name)
     document.getElementById('list_config').appendChild(cf_p)
+    $('#cf_name'+parseInt(i+1)).on('click', function(){
+      alert("Ctrl+F5 để xem thay đổi")
+    })
   }
 }
-$("#btn_upload_img").on("click", function(){
 
-});
 </script>
 
 <div class="row">
@@ -319,11 +349,11 @@ $("#btn_upload_img").on("click", function(){
       </form>
       <div class="h5" style=" margin-top:10px">Chọn ảnh demo:</div>
       <div id="demo_img" style="padding-top: 10px;">
-        <a href="/demo_static_demo_hoadontiendien-3.png"><img src="static/demo/hoadontiendien-3.png" alt="" width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_cccd-1.png"><img src="static/demo/cccd-1.png" alt=""  width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_CMND-29.png"><img src="static/demo/CMND-29.png" alt=""  width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_CMND-28.png"><img src="static/demo/CMND-28.png" alt=""  width="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_IMG-0924.png"><img src="static/demo/IMG-0924.png" alt=""  width="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_hoadontiendien-3.png"><img src="static/demo/hoadontiendien-3.png" alt="" height="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_cccd-1.png"><img src="static/demo/cccd-1.png" alt=""  height="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_CMND-29.png"><img src="static/demo/CMND-29.png" alt=""  height="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_CMND-28.png"><img src="static/demo/CMND-28.png" alt=""  height="50" style="border-radius: 5px;"></a>
+        <a href="/demo_static_demo_IMG-0924.png"><img src="static/demo/IMG-0924.png" alt=""  height="50" style="border-radius: 5px;"></a>
         <!-- <a href="/demo_static_demo_cccd-3.png"><img src="static/demo/cccd-3.png" alt=""  width="50" style="border-radius: 5px;"></a> -->
       </div>
       <!-- <input id="btn_autodetect" type="submit" value="Auto Detect" onclick="javascript:postAutoDetect()" style="margin-top: 17px;"></input> -->
@@ -340,8 +370,8 @@ $("#btn_upload_img").on("click", function(){
       </form> -->
       <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div>
       <div id="list_config" ></div>
-      <p><button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Xử lý ảnh(Ctrl+F5)</button></p>
-      <p><button id="show_config" onclick="javascript:showConfig()">Hiện khung</button></p>
+      <!-- <p><button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Xử lý ảnh(Ctrl+F5)</button></p> -->
+      <!-- <p><button id="show_config" onclick="javascript:showConfig()">Hiện khung</button></p> -->
       <p><input id="btn_recognition_all_rect" type="submit" value="Nhận dạng" onclick="javascript:postRecognizeAllRectangles()"></input></p>
       <!-- <input id="btn_clear_all" type="submit" value="Clear" onclick="javascript:clearAll()"></input> -->
       <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>

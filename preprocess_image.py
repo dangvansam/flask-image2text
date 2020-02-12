@@ -10,7 +10,7 @@ GOOD_MATCH_PERCENT = 0.2
 def alignImages(im1, im2):
 
   # Convert images to grayscale
-  print(im2.shape)
+  #print(im2.shape)
   im1Gray = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY)
   im2Gray = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
    
@@ -44,17 +44,20 @@ def alignImages(im1, im2):
    
   # Find homography
   h, mask = cv2.findHomography(points1, points2, cv2.RANSAC)
- 
+
   # Use homography
   height, width, channels = im2.shape
-  im1Reg = cv2.warpPerspective(im1, h, (width, height))
-   
+  try:
+    im1Reg = cv2.warpPerspective(im1, h, (width, height))
+  except:
+    print('No transform apply!!!')
+    im1Reg = im1
   return im1Reg, h
  
 def alignFile(filename1, filename2):
   #print(filename2)
-  imReference = cv2.imread(filename1, cv2.IMREAD_COLOR)
-  im = cv2.imread(filename2, cv2.IMREAD_COLOR)
+  imReference = cv2.imread(filename1, cv2.COLOR_BGR2RGB)
+  im = cv2.imread(filename2, cv2.COLOR_BGR2RGB)
   imReg, h = alignImages(im, imReference)
   outFilename = filename2#.replace('.png','_align.png')
   cv2.imwrite(outFilename, imReg)

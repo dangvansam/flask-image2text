@@ -9,6 +9,7 @@ import shutil
 import numpy as np
 
 app = Flask(__name__)
+
 @app.route('/',methods=['GET'])
 def selectPageMode():
     return render_template('select_mode.html')
@@ -262,9 +263,6 @@ def viewConfig2_byupload():
     print(rectangles)
     print(scale_img)
     session['config_filename2'] = config_filename
-    # session['rectnames'] = rectnames
-    # session['rectangles'] = rectangles
-    # session['scale_img'] = scale_img
     print(rectnames)
     return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 
@@ -283,6 +281,30 @@ def viewConfig_byselect(config_filename):
             rectangles.append(rect['rectangle'])
     return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 
+@app.route('/selectconfigandalign_<string:config_filename>')
+def selectConfigAndAlign(config_filename):
+    if 'filename2' not in session:
+        return index2()
+    session['config_filename2'] = config_filename
+    config = []
+    rectnames = []
+    rectangles = []
+    scale_img = 0.0
+    with open('static/mau/' + config_filename + '.json') as f:
+        config = json.load(f)
+        scale_img = float(config['scale_img'])
+        for rect in config['rectangles']:
+            rectnames.append(rect['rectname'])
+            rectangles.append(rect['rectangle'])
+
+    image_process_filename = session['filename2']
+    json_config_name = session['config_filename2']
+    image_confile_filename = 'static/mau/' + json_config_name.replace('.json','') + '.png'
+
+    _ = alignFile(image_confile_filename, image_process_filename)
+
+    return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
+
 def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
     """Return a sharpened version of the image, using an unsharp mask."""
     blurred = cv2.GaussianBlur(image, kernel_size, sigma)
@@ -294,19 +316,6 @@ def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
         low_contrast_mask = np.absolute(image - blurred) < threshold
         np.copyto(sharpened, image, where=low_contrast_mask)
     return sharpened
-
-def kmeans(input_img, k, i_val):
-    hist = cv2.calcHist([input_img],[0],None,[256],[0,256])
-    img = input_img.ravel()
-    img = np.reshape(img, (-1, 1))
-    img = img.astype(np.float32)
-
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-    flags = cv2.KMEANS_RANDOM_CENTERS
-    compactness,labels,centers = cv2.kmeans(img,k,None,criteria,10,flags)
-    centers = np.sort(centers, axis=0)
-
-    return centers[i_val].astype(int), centers, hist
 
 @app.route('/recognize_all_rectangles2',methods=['POST'])
 def recognizeAllrectangle2():
@@ -352,13 +361,9 @@ def preprocessImage():
     image_process_filename = session['filename2']
     json_config_name = session['config_filename2']
     image_confile_filename = 'static/mau/' + json_config_name.replace('.json','') + '.png'
-    print(image_confile_filename, image_process_filename, json_config_name)
+
     _ = alignFile(image_confile_filename, image_process_filename)
-    #print(session['filename2'])
-    #session.pop('filename2',None)
-    #session['filename2'] = align_filename
-    #print(session['filename2'])
-    #session['filename2'] = align_filename
+
     rectnames = []
     rectangles = []
     scale_img = 0.0
@@ -368,8 +373,10 @@ def preprocessImage():
         for rect in config['rectangles']:
             rectnames.append(rect['rectname'])
             rectangles.append(rect['rectangle'])
-    #return redirect('/index2')
+
     return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
+
 if __name__ == '__main__':
     app.secret_key = 'dangvansam'
+    #app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True)
