@@ -5,6 +5,7 @@
 <body>
 <style>
   @import url('https://fonts.googleapis.com/css?family=Assistant&display=swap');
+  @import url('https://fonts.googleapis.com/css?family=Noto+Sans&display=swap&subset=vietnamese');
   html, body {
   width:  100%;
   height: 100%;
@@ -12,13 +13,12 @@
   }
   body {
     background: rgb(37, 26, 48);
-    font-family:'Assistant', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
     color: white;
-    font-size: 16px;
   }
   input[type=submit] {
     background-color: #755fd4;
-    border-radius: 16px;
+    /* border-radius: 16px; */
     border: none;
     color: white;
     padding: 8px 16px;
@@ -27,7 +27,7 @@
   }
   input[type=file] {
     background-color: #755fd4;
-    border-radius: 14px;
+    /* border-radius: 14px; */
     border: none;
     color: white;
     padding: 8px 16px;
@@ -58,13 +58,13 @@
     background-size:     cover;
   }
   a {
-    font-family:'Assistant';
+    font-family: 'Noto Sans', sans-serif;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
   }
   .btn_custom {
     background-color: #755fd4;
-    border-radius: 16px;
+    /* border-radius: 16px; */
     /* padding: 50px 50px; */
     width: 120px;
     height: 37px;
@@ -73,19 +73,9 @@
     cursor: pointer;
     /* margin: 20px; */
   }
-  img {
-  border: 0px solid #ddd;
-  border-radius: 10px;
-  padding: 2px;
-  /* width: 150px; */
-  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
-  }
 
-  img:hover {
-    border: 1px solid #ddd;
-    /* border: 0 0 2px 1px #e4bd3e; */
-    /* padding: 5px; */
-  }
+
+
 </style>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
@@ -301,31 +291,46 @@ function checkSelectImageFile(){
 
 function showListConfigFiles(){
   for (var i =0; i< list_config_files.length; ++i){
-    var cf_name = document.createElement('a')
-    cf_name.setAttribute('id','cf_name'+parseInt(i+1))
-    if (list_config_files[i] == '{{ config_filename }}'){
-      cf_name.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' width='150'; title='Chọn mẫu'> <p style='margin-top:0px; margin-bottom: 25px;'> Đã chọn: " + "<span style='color:lime;'> " + list_config_files[i] + " </span></p>"
+    var cf_divcard = document.createElement('div')
+    cf_divcard.className = "cf_divcard"
+    cf_divcard.id = "cf_divcard"+i
+    cf_divcard.style = "background-color: seagreen; border-radius:4px; box-shadow:0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); display: inline-block; text-align:center; width: 180px; height: 100px; margin:10px; padding:10px;"
+    if (i%2==0){
+      var div_tmp = document.createElement('div')
+      div_tmp.id = "div_tmp"+i
+      div_tmp.style = "background-size: cover;"
+      document.getElementById('list_config').appendChild(div_tmp)
+      document.getElementById("div_tmp"+i).appendChild(cf_divcard)
     }
     else{
-      cf_name.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' width='150'; title='Chọn mẫu'> <p style='margin-top:0px; margin-bottom: 25px;'>" + "<span style='color:white;'> " + list_config_files[i] + " </span></p>"
+      document.getElementById("div_tmp"+parseInt(i-1)).appendChild(cf_divcard)
     }
 
-    cf_name.setAttribute('href', 'selectconfigandalign_'+ list_config_files[i])
-    cf_name.setAttribute('style','margin-bottom:17px;')
+    var cf_img = document.createElement('a')
+    cf_img.id = "cf_img"
+    cf_img.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' height='62'>"
+    cf_img.href = "selectconfigandalign_" + list_config_files[i]
+    //cf_img.style = "margin-bottom:17px;"
 
-    var cf_p = document.createElement('p')
+    var cf_name = document.createElement('h5')
+    cf_name.innerHTML = list_config_files[i]
+    //cf_name.style = "position: absolute;"
 
-    document.getElementById('list_config').appendChild(cf_name)
-    document.getElementById('list_config').appendChild(cf_p)
-    $('#cf_name'+parseInt(i+1)).on('click', function(){
-      alert("Ctrl+F5 để xem thay đổi")
+    document.getElementById('cf_divcard'+i).appendChild(cf_img)
+    document.getElementById('cf_divcard'+i).appendChild(cf_name)
+    $('#cf_img'+parseInt(i+1)).on('click', function(){
+      alert("Sau khi chọn mẫu nhấn Ctrl+F5 để xem thay đổi sau")
     })
+    $("#cf_divcard"+i).on('')
   }
 }
 
 </script>
 
 <div class="row">
+  <div class="home" style="text-align: center; padding-bottom: 20px;">
+    <button class="btn_custom" onclick="window.location.href = '/';">Trang chủ</button>
+  </div>
   <div class="column">
     {% if filename == '' %}
       <h5></h5>
@@ -334,27 +339,30 @@ function showListConfigFiles(){
     {% endif %}
   </div>
   <div class="column" style="text-align: right;">
-    <div class="xuli" style="text-align: center; padding-left: 50px; padding-top: 10px;">
-      <button class="btn_custom" onclick="window.location.href = '/';">Trang chủ</button>
-      <!--form upload image-->
-      {% if filename == '' %}
-      <h5 id='filename'>Chọn ảnh</h5>
-      {% else %}
-      <h5 id='filename'>Ảnh đã chọn: <span style="color: gold;">{{filename}}</span></h5>
-      {% endif %}
+    <div class="xuli" style="text-align: center; padding-left: 40px;">
 
-      <form name ='form_upload' method="post" action="/uploadImage2" enctype="multipart/form-data">
-        <input name="file" type="file" id="select_file"/>
-        <input id="btn_upload_img" type="submit" value="Tải ảnh lên">
-      </form>
-      <div class="h5" style=" margin-top:10px">Chọn ảnh demo:</div>
-      <div id="demo_img" style="padding-top: 10px;">
-        <a href="/demo_static_demo_hoadontiendien-3.png"><img src="static/demo/hoadontiendien-3.png" alt="" height="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_cccd-1.png"><img src="static/demo/cccd-1.png" alt=""  height="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_CMND-29.png"><img src="static/demo/CMND-29.png" alt=""  height="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_CMND-28.png"><img src="static/demo/CMND-28.png" alt=""  height="50" style="border-radius: 5px;"></a>
-        <a href="/demo_static_demo_IMG-0924.png"><img src="static/demo/IMG-0924.png" alt=""  height="50" style="border-radius: 5px;"></a>
-        <!-- <a href="/demo_static_demo_cccd-3.png"><img src="static/demo/cccd-3.png" alt=""  width="50" style="border-radius: 5px;"></a> -->
+      <div class="step1" style="padding: 10px; border: thin solid springgreen">
+        <h4>Bước 1: Upload ảnh từ máy tính</h4>
+        <!--form upload image-->
+        <!-- {% if filename == '' %}
+        <h5 id='filename'>Chọn ảnh</h5>
+        {% else %}
+        <h5 id='filename'>Ảnh đã chọn: <span style="color: gold;">{{filename}}</span></h5>
+        {% endif %} -->
+  
+        <form name ='form_upload' method="post" action="/uploadImage2" enctype="multipart/form-data">
+          <input name="file" type="file" id="select_file"/>
+          <input id="btn_upload_img" type="submit" value="Tải ảnh lên">
+        </form>
+        <h4 style=" margin-top:10px">Hoặc chọn 1 ảnh có sẵn sau:</h4>
+        <div id="demo_img">
+          <a href="/demo_static_demo_hoadontiendien-3.png"><img src="static/demo/hoadontiendien-3.png" alt="" height="50" style="border-radius: 0px;"></a>
+          <a href="/demo_static_demo_cccd-1.png"><img src="static/demo/cccd-1.png" alt=""  height="50" style="border-radius: 0px;"></a>
+          <a href="/demo_static_demo_CMND-29.png"><img src="static/demo/CMND-29.png" alt=""  height="50" style="border-radius: 0px;"></a>
+          <a href="/demo_static_demo_CMND-28.png"><img src="static/demo/CMND-28.png" alt=""  height="50" style="border-radius: 0px;"></a>
+          <a href="/demo_static_demo_IMG-0924.png"><img src="static/demo/IMG-0924.png" alt=""  height="50" style="border-radius: 0px;"></a>
+          <!-- <a href="/demo_static_demo_cccd-3.png"><img src="static/demo/cccd-3.png" alt=""  width="50" style="border-radius: 5px;"></a> -->
+        </div>
       </div>
       <!-- <input id="btn_autodetect" type="submit" value="Auto Detect" onclick="javascript:postAutoDetect()" style="margin-top: 17px;"></input> -->
       <!--form upload config-->
@@ -368,13 +376,19 @@ function showListConfigFiles(){
         <input name="file2" type="file" id="select_config_file"/>
         <input id="btn_upload_config" type="submit" value="Tải mẫu lên">
       </form> -->
-      <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div>
-      <div id="list_config" ></div>
+      <div class="step2" style="margin-top: 8px; padding: 10px; border: thin solid springgreen">
+        <h4>Bước 2: Chọn mẫu sau đó ấn "Ctrl + F5" để xem thay đổi</h4>
+        <!-- <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div> -->
+        <div id="list_config" ></div>
+      </div>
       <!-- <p><button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Xử lý ảnh(Ctrl+F5)</button></p> -->
       <!-- <p><button id="show_config" onclick="javascript:showConfig()">Hiện khung</button></p> -->
-      <p><input id="btn_recognition_all_rect" type="submit" value="Nhận dạng" onclick="javascript:postRecognizeAllRectangles()"></input></p>
-      <!-- <input id="btn_clear_all" type="submit" value="Clear" onclick="javascript:clearAll()"></input> -->
-      <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>
+      <div class="step3" style="margin-top: 8px; padding: 10px; border: thin solid springgreen">
+        <h4>Bước 3: Nhận dạng</h4>
+        <p><input id="btn_recognition_all_rect" type="submit" value="Nhận dạng" onclick="javascript:postRecognizeAllRectangles()"></input></p>
+        <!-- <input id="btn_clear_all" type="submit" value="Clear" onclick="javascript:clearAll()"></input> -->
+        <div id="list_rect" style="text-align: initial; margin-left: 20px;"></div>
+      </div>
       <!-- <h5>Save filename</h5>
       <p><input id ="config_filename_pl" placeholder=""></input></p>
       <p><input type="submit" value="Save rects" onclick="javascript:postRectangles()"></input></p> -->

@@ -10,6 +10,7 @@ import numpy as np
 
 app = Flask(__name__)
 
+
 @app.route('/',methods=['GET'])
 def selectPageMode():
     return render_template('select_mode.html')
