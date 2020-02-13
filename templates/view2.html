@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head><link rel="shortcut icon" href=""></head>
+<head>
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Expires" content="-1">
+</head>
 <title>Flask image2text</title>
 <body>
 <style>
@@ -66,7 +69,7 @@
     background-color: #755fd4;
     /* border-radius: 16px; */
     /* padding: 50px 50px; */
-    width: 120px;
+    width: 100px;
     height: 37px;
     border: none;
     color: white;
@@ -74,7 +77,9 @@
     /* margin: 20px; */
   }
 
-
+  .cf_divcard:hover {
+    background-color: yellow;
+  }
 
 </style>
 
@@ -270,7 +275,7 @@ function postRecognizeAllRectangles(){
             drawWithText(response.data)
             document.getElementById("btn_recognition_all_rect").value = "Nhận dạng"
             for (var n=0; n< rectangles.length; ++n){
-              document.getElementById("rect_text"+parseInt(n+1)).innerHTML = "<span style='color:gold;'> "+response.data[n] + " </span>"
+              document.getElementById("rect_text"+parseInt(n+1)).innerHTML = "<span style='color:gold; word-break: break-all;'> "+response.data[n] + " </span>"
               }
             }
           else {console.log("server ocr error!")}
@@ -290,38 +295,50 @@ function checkSelectImageFile(){
 }
 
 function showListConfigFiles(){
-  for (var i =0; i< list_config_files.length; ++i){
+  for (var i=0; i< list_config_files.length; ++i){
     var cf_divcard = document.createElement('div')
     cf_divcard.className = "cf_divcard"
     cf_divcard.id = "cf_divcard"+i
-    cf_divcard.style = "background-color: seagreen; border-radius:4px; box-shadow:0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); display: inline-block; text-align:center; width: 180px; height: 100px; margin:10px; padding:10px;"
+    if (list_config_files[i] == "{{ config_filename }}"){
+      cf_divcard.style = "background-color: seagreen; cursor:pointer; border: 2px solid red; border-radius:4px; box-shadow:0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); display: inline-block; text-align:center; width: 180px; height: 100px; margin:10px; padding:10px;"
+    }
+    else{
+      cf_divcard.style = "background-color: seagreen; cursor:pointer; border-radius:4px; box-shadow:0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); display: inline-block; text-align:center; width: 180px; height: 100px; margin:10px; padding:10px;"
+    }
+
     if (i%2==0){
       var div_tmp = document.createElement('div')
       div_tmp.id = "div_tmp"+i
-      div_tmp.style = "background-size: cover;"
       document.getElementById('list_config').appendChild(div_tmp)
       document.getElementById("div_tmp"+i).appendChild(cf_divcard)
     }
     else{
       document.getElementById("div_tmp"+parseInt(i-1)).appendChild(cf_divcard)
     }
-
     var cf_img = document.createElement('a')
     cf_img.id = "cf_img"
     cf_img.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' height='62'>"
-    cf_img.href = "selectconfigandalign_" + list_config_files[i]
+    //cf_img.href = "selectconfigandalign_" + list_config_files[i]
     //cf_img.style = "margin-bottom:17px;"
-
+    
     var cf_name = document.createElement('h5')
     cf_name.innerHTML = list_config_files[i]
     //cf_name.style = "position: absolute;"
-
+    
     document.getElementById('cf_divcard'+i).appendChild(cf_img)
     document.getElementById('cf_divcard'+i).appendChild(cf_name)
-    $('#cf_img'+parseInt(i+1)).on('click', function(){
-      alert("Sau khi chọn mẫu nhấn Ctrl+F5 để xem thay đổi sau")
-    })
-    $("#cf_divcard"+i).on('')
+
+    $("#cf_divcard"+i).hover(function(){
+      console.log(parseInt(String(this.id).slice(10,String(this.id).length+1)))
+      var index = parseInt(String(this.id).slice(10,String(this.id).length+1))
+      $(this).css("background-color", "darkseagreen");
+      },function(){
+      $(this).css("background-color", "seagreen");
+    });
+    $("#cf_divcard"+i).click(function(){
+      var index = parseInt(String(this.id).slice(10,String(this.id).length+1))
+      window.location.href = "selectconfigandalign_" + list_config_files[index]
+    });
   }
 }
 
@@ -341,7 +358,7 @@ function showListConfigFiles(){
   <div class="column" style="text-align: right;">
     <div class="xuli" style="text-align: center; padding-left: 40px;">
 
-      <div class="step1" style="padding: 10px; border: thin solid springgreen">
+      <div class="step1" style=" padding: 10px; border: thin solid springgreen">
         <h4>Bước 1: Upload ảnh từ máy tính</h4>
         <!--form upload image-->
         <!-- {% if filename == '' %}
@@ -380,6 +397,7 @@ function showListConfigFiles(){
         <h4>Bước 2: Chọn mẫu sau đó ấn "Ctrl + F5" để xem thay đổi</h4>
         <!-- <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div> -->
         <div id="list_config" ></div>
+        <button class="btn_custom" onClick="javascript:setTimeout(function(){window.location.reload();});">OK</button>
       </div>
       <!-- <p><button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Xử lý ảnh(Ctrl+F5)</button></p> -->
       <!-- <p><button id="show_config" onclick="javascript:showConfig()">Hiện khung</button></p> -->

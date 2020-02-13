@@ -380,4 +380,5 @@ def preprocessImage():
 if __name__ == '__main__':
     app.secret_key = 'dangvansam'
     #app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(debug=True)
+    #app.run(debug=True)
+    app.run(debug=True, host="192.168.2.26", port=4040)
