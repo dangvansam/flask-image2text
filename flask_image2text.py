@@ -10,10 +10,10 @@ import numpy as np
 
 app = Flask(__name__)
 
-
 @app.route('/',methods=['GET'])
 def selectPageMode():
     return render_template('select_mode.html')
+
 @app.route('/index',methods=['GET'])
 def index():
     filename = ''
@@ -303,8 +303,37 @@ def selectConfigAndAlign(config_filename):
     image_confile_filename = 'static/mau/' + json_config_name.replace('.json','') + '.png'
 
     _ = alignFile(image_confile_filename, image_process_filename)
-
+    #print(a)
     return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
+
+@app.route('/post_align_<string:config_filename>',methods=["POST","GET"])
+def postConfigAndAlign(config_filename):
+    if 'filename2' not in session:
+        return index2()
+    session['config_filename2'] = config_filename
+    config = []
+    rectnames = []
+    rectangles = []
+    scale_img = 0.0
+    with open('static/mau/' + config_filename + '.json') as f:
+        config = json.load(f)
+        scale_img = float(config['scale_img'])
+        for rect in config['rectangles']:
+            rectnames.append(rect['rectname'])
+            rectangles.append(rect['rectangle'])
+
+    image_process_filename = session['filename2']
+    json_config_name = session['config_filename2']
+    image_config_filename = 'static/mau/' + json_config_name.replace('.json','') + '.png'
+
+    a = alignFile(image_config_filename, image_process_filename)
+    session['filename2'] = a
+    #print(a)
+    resp = jsonify(success=True, rectnames=rectnames, rectangles=rectangles, scale_img=scale_img)
+    if request.method == "POST":
+        return resp
+    if request.method == "GET":
+        return render_template('view2.html', filename = session['filename2'], list_config_files = session['list_config_files'], config_filename = session['config_filename2'], rectnames = rectnames, rectangles = rectangles, scale_img=scale_img)
 
 def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
     """Return a sharpened version of the image, using an unsharp mask."""
@@ -380,5 +409,5 @@ def preprocessImage():
 if __name__ == '__main__':
     app.secret_key = 'dangvansam'
     #app.config['TEMPLATES_AUTO_RELOAD'] = True
-    #app.run(debug=True)
-    app.run(debug=True, host="192.168.2.26", port=4040)
+    app.run(debug=True)
+    #app.run(debug=True, host="192.168.2.26", port=4040)

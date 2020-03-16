@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Cache-control" content="no-cache">
-  <meta http-equiv="Expires" content="-1">
 </head>
 <title>Flask image2text</title>
 <body>
@@ -254,7 +252,7 @@ function showRectnamed(){
 
 function postRecognizeAllRectangles(){
   if (rectangles.length == 0){
-      alert('Select config file!')
+      alert('Chọn mẫu trước!')
   }
   else{
       document.getElementById("btn_recognition_all_rect").value = "Đang xử lý"
@@ -281,6 +279,42 @@ function postRecognizeAllRectangles(){
           else {console.log("server ocr error!")}
           }});
   }
+}
+
+function postAlignImage(cf_filename){
+  console.log(cf_filename)
+  $.ajax({
+    type: "POST",
+    url: "/post_align_" + cf_filename,
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    success:function (response) {
+        console.log('postAlignImage() successed!:',response)
+        if (response.success == true){
+          //console.log("server align successed!")
+          // console.log(response.rectnames)
+          // console.log(response.rectangles)
+          // console.log(response.scale_img)
+          rectangles = response.rectangles
+          rectnames = response.rectnames
+          scale_img = response.scale_img
+          //window.location.reload(true);
+          //console.log("sadsadsadsa {{ filename }}")
+          //window.location.href = "/post_align_" + cf_filename;
+          //document.getElementById("canvas").style.background = "url('{{ filename }}')";
+          draw()
+          //clearAllRectname()
+          //showConfig()
+          // addManyRectname()
+          // drawWithText(response.data)
+          // document.getElementById("btn_recognition_all_rect").value = "Nhận dạng"
+          // for (var n=0; n< rectangles.length; ++n){
+          //   document.getElementById("rect_text"+parseInt(n+1)).innerHTML = "<span style='color:gold; word-break: break-all;'> "+response.data[n] + " </span>"
+          //   }
+
+          }
+        else {console.log("server align error!")}
+        }});
 }
 
 function checkSelectImageFile(){
@@ -318,18 +352,15 @@ function showListConfigFiles(){
     var cf_img = document.createElement('a')
     cf_img.id = "cf_img"
     cf_img.innerHTML = "<img src='static/mau/"+list_config_files[i]+".png' height='62'>"
-    //cf_img.href = "selectconfigandalign_" + list_config_files[i]
-    //cf_img.style = "margin-bottom:17px;"
     
     var cf_name = document.createElement('h5')
     cf_name.innerHTML = list_config_files[i]
-    //cf_name.style = "position: absolute;"
     
     document.getElementById('cf_divcard'+i).appendChild(cf_img)
     document.getElementById('cf_divcard'+i).appendChild(cf_name)
 
     $("#cf_divcard"+i).hover(function(){
-      console.log(parseInt(String(this.id).slice(10,String(this.id).length+1)))
+      //console.log(parseInt(String(this.id).slice(10,String(this.id).length+1)))
       var index = parseInt(String(this.id).slice(10,String(this.id).length+1))
       $(this).css("background-color", "darkseagreen");
       },function(){
@@ -338,6 +369,8 @@ function showListConfigFiles(){
     $("#cf_divcard"+i).click(function(){
       var index = parseInt(String(this.id).slice(10,String(this.id).length+1))
       window.location.href = "selectconfigandalign_" + list_config_files[index]
+      //console.log(index)
+      //postAlignImage(list_config_files[index])
     });
   }
 }
@@ -397,7 +430,6 @@ function showListConfigFiles(){
         <h4>Bước 2: Chọn mẫu sau đó ấn "Ctrl + F5" để xem thay đổi</h4>
         <!-- <div class="h5" style="margin-bottom: 10px;">Chọn mẫu:</div> -->
         <div id="list_config" ></div>
-        <button class="btn_custom" onClick="javascript:setTimeout(function(){window.location.reload();});">OK</button>
       </div>
       <!-- <p><button class="btn_custom" onclick="window.location.href = '/preprocess_image';">Xử lý ảnh(Ctrl+F5)</button></p> -->
       <!-- <p><button id="show_config" onclick="javascript:showConfig()">Hiện khung</button></p> -->
