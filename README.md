@@ -4,4 +4,4 @@
 
 ![alt text](eastdetect.PNG)
 ![alt text](sudungmau.PNG)
-![alt text](eastdetect2.PNG)
+![alt text](sudungmau2.PNG)
