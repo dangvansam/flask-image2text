@@ -1,4 +1,3 @@
-from __future__ import print_function
 import cv2
 import numpy as np
  
@@ -47,43 +46,18 @@ def alignImages(im1, im2):
 
   # Use homography
   height, width, channels = im2.shape
-  try:
-    im1Reg = cv2.warpPerspective(im1, h, (width, height))
-  except:
-    print('No transform apply!!!')
-    im1Reg = im1
+
+  im1Reg = cv2.warpPerspective(im1, h, (width, height))
+
   return im1Reg, h
  
 def alignFile(filename1, filename2):
-  #print(filename2)
+  #print(filename1, filename2)
   imReference = cv2.imread(filename1, cv2.COLOR_BGR2RGB)
   im = cv2.imread(filename2, cv2.COLOR_BGR2RGB)
   imReg, h = alignImages(im, imReference)
+  #cv2.imshow("aaa",imReg)
+  #cv2.waitKey()
   outFilename = filename2#.replace('.png','_align.png')
   cv2.imwrite(outFilename, imReg)
   return outFilename
-
-# if __name__ == '__main__':
-   
-#   # Read reference image
-#   refFilename = "hoadon2/Hoadontiendien.jpg"
-#   print("Reading reference image : ", refFilename)
-#   imReference = cv2.imread(refFilename, cv2.IMREAD_COLOR)
- 
-#   # Read image to be aligned
-#   imFilename = "hoadon2/Hoadontiendien-a.jpg"
-#   print("Reading image to align : ", imFilename);  
-#   im = cv2.imread(imFilename, cv2.IMREAD_COLOR)
-   
-#   print("Aligning images ...")
-#   # Registered image will be resotred in imReg. 
-#   # The estimated homography will be stored in h. 
-#   imReg, h = alignImages(im, imReference)
-   
-#   # Write aligned image to disk. 
-#   outFilename = "hoadon2/align-a.jpg"
-#   print("Saving aligned image : ", outFilename); 
-#   cv2.imwrite(outFilename, imReg)
- 
-#   # Print estimated homography
-#   print("Estimated homography : \n",  h)
