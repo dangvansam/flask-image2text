@@ -1,5 +1,5 @@
 # flask image2text
-**image to text east + tesseract and flask server**
+**image to text east + tesseract and flask server**  
  python flask_image2text.py
 
 ![alt text](eastdetect.PNG)
