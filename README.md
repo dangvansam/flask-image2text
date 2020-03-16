@@ -1,2 +1,2 @@
 # nhandanghoadon
-image to text tesseract and flask server
+image to text east+tesseract and flask server
